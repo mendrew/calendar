@@ -79,6 +79,10 @@ html {
   background-color: #cccccc82;
 }
 
+.month__day--weekend {
+  color: #ff0102;
+}
+
 .month__day--loading {
   position: relative;
 }
