@@ -1,14 +1,14 @@
 "use strict";
 
 const CELLS_IN_MONTH = 35;
+// in case month has 31 day and started at the last day of the week
 const CELLS_IN_EXTENDED_MONTH = 42;
+const SUNDAY_INDEX = 0;
+const SATURDAY_INDEX = 6;
 
 function isWeekendIndex(dayIndex, monthFirstDayIndex) {
-  const sunday = 0;
-  const saturday = 6;
-
   const weekDay = dayIndex % 7;
-  return weekDay === sunday || weekDay === saturday;
+  return weekDay === SUNDAY_INDEX || weekDay === SATURDAY_INDEX;
 }
 
 // An integer between 0 and 6
@@ -92,13 +92,6 @@ function renderCalendarTitle(date) {
   calendarTitle.classList.remove("month__title--loading");
 }
 
-function renderCalendarMonth(date) {
-  const calendarDays = constructCalendarDays(date);
-  renderCalendarCells(calendarDays);
-  renderCalendarTitle(date);
-  setCurrentMonthToDOM(date);
-}
-
 function setCurrentMonthToDOM(currentDate) {
   const monthElement = document.querySelector(".calendar__month");
   if (!monthElement) {
@@ -140,6 +133,13 @@ function changeMonthHandler(event) {
   }
 
   renderCalendarMonth(newMonthDate);
+}
+
+function renderCalendarMonth(date) {
+  const calendarDays = constructCalendarDays(date);
+  renderCalendarCells(calendarDays);
+  renderCalendarTitle(date);
+  setCurrentMonthToDOM(date);
 }
 
 function attachMonthChangeHandlers() {
