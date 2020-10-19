@@ -20,12 +20,33 @@ html {
 }
 
 .month__title {
+  margin: auto;
   margin-bottom: 20px;
 
   font-size: 42px;
   font-weight: bold;
   text-align: center;
 }
+
+.month__title--loading {
+  position: relative;
+
+  width: 270px;
+  height: 48px;
+}
+
+.month__title--loading::before {
+  content: " ";
+
+  position: absolute;
+  left: 0;
+
+  width: 270px;
+  height: 48px;
+
+  background-color: #f0f0f0;
+}
+
 
 .month__container {
   margin: 40px;
@@ -75,7 +96,7 @@ html {
   transition: background-color 0.2s;
 }
 
-.month__day:hover {
+.month__day:not(:empty):hover {
   background-color: #cccccc82;
 }
 
