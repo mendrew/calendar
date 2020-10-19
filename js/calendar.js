@@ -1,6 +1,7 @@
 "use strict";
 
 const CELLS_IN_MONTH = 35;
+const CELLS_IN_EXTENDED_MONTH = 42;
 
 function isWeekendIndex(dayIndex, monthFirstDayIndex) {
   const sunday = 0;
@@ -35,42 +36,47 @@ function constructCalendarDays(date) {
   // An integer number, between 1 and 31
   const lastDayInMonth = getLastDayInMonth(date);
   const monthLastDayIndex = monthFirstDayIndex + lastDayInMonth - 1;
+  const numberOfCellsInMonth = monthLastDayIndex > CELLS_IN_MONTH
+    ? CELLS_IN_EXTENDED_MONTH
+    : CELLS_IN_MONTH;
 
-  const calendarDays = [...Array(CELLS_IN_MONTH)].map((_, dayIndex) => {
+  const calendarDays = [...Array(numberOfCellsInMonth)].map((_, dayIndex) => {
     const isNotMonthDay = dayIndex < monthFirstDayIndex || dayIndex > monthLastDayIndex;
-    if (isNotMonthDay) {
-      return undefined;
-    }
     const isWeekend = isWeekendIndex(dayIndex, monthFirstDayIndex);
 
-    return {
-      day: dayIndex - monthFirstDayIndex + 1,
+    const day = {
+      value: isNotMonthDay ? undefined : dayIndex - monthFirstDayIndex + 1,
       isWeekend,
     };
+
+    return day;
   });
 
   return calendarDays;
 }
 
 function renderCalendarCells(calendarDays) {
-  const calendarDaysNodes = document.querySelectorAll(".month__day");
-
-  if (calendarDaysNodes.length !== calendarDays.length) {
+  const calendarDaysParent = document.querySelector(".month__body");
+  if (!calendarDaysParent) {
     return;
   }
 
+  const daysContainer = new DocumentFragment();
   calendarDays.map((day, index)=> {
-    const dayNode = calendarDaysNodes[index];
-    if (!day) {
-      dayNode.innerHTML = "";
-    } else {
-      dayNode.innerHTML = day.day;
-      if (day.isWeekend) {
-        dayNode.classList.add("month__day--weekend");
-      }
+    const dayNode = document.createElement('div');
+    dayNode.classList.add("month__day");
+
+    dayNode.innerHTML = day.value ? day.value : "";
+
+    if (day.isWeekend) {
+      dayNode.classList.add("month__day--weekend");
     }
-    dayNode.classList.remove("month__day--loading");
+
+    daysContainer.append(dayNode);
   });
+
+  calendarDaysParent.innerHTML = '';
+  calendarDaysParent.append(daysContainer);
 }
 
 function renderCalendarTitle(date) {
