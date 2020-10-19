@@ -23,12 +23,11 @@ function getLastDayInMonth(date) {
   return lastDayInMonth;
 }
 
-function initializeCalendar() {
-  const currentDate = new Date();
-  const monthFirstDayIndex = getWeekDayOfFirstDayInMonth(currentDate);
+function constructCalendarDays(date) {
+  const monthFirstDayIndex = getWeekDayOfFirstDayInMonth(date);
 
   // An integer number, between 1 and 31
-  const lastDayInMonth = getLastDayInMonth(currentDate);
+  const lastDayInMonth = getLastDayInMonth(date);
   const monthLastDayIndex = monthFirstDayIndex + lastDayInMonth - 1;
 
   const calendarDays = [...Array(CELLS_IN_MONTH)].map((_, dayIndex) => {
@@ -44,7 +43,15 @@ function initializeCalendar() {
     };
   });
 
+  return calendarDays;
+}
+
+function renderCalendarCells(calendarDays) {
   const calendarDaysNodes = document.querySelectorAll(".month__day");
+
+  if (calendarDaysNodes.length !== calendarDays.length) {
+    return;
+  }
 
   calendarDays.map((day, index)=> {
     const dayNode = calendarDaysNodes[index];
@@ -56,7 +63,29 @@ function initializeCalendar() {
         dayNode.classList.add("month__day--weekend");
       }
     }
+    dayNode.classList.remove("month__day--loading");
   });
+}
+
+function renderCalendarTitle(date) {
+  const monthString = new Intl.DateTimeFormat('en-US', { month: 'long'}).format(date);
+  const year = date.getFullYear();
+
+  const calendarTitle = document.querySelector(".month__title");
+  if (!calendarTitle) {
+    return;
+  }
+
+  calendarTitle.innerHTML = `${monthString} ${year}`;
+  calendarTitle.classList.remove("month__title--loading");
+}
+
+function initializeCalendar() {
+  const currentDate = new Date();
+
+  const calendarDays = constructCalendarDays(currentDate);
+  renderCalendarCells(calendarDays);
+  renderCalendarTitle(currentDate);
 }
 
 initializeCalendar();
