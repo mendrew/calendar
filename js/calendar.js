@@ -17,11 +17,17 @@ function getWeekDayOfFirstDayInMonth(date) {
   return dateCopy.getDay();
 }
 
+function getLastDayInMonthDate(date) {
+  const lastDayInMonthDate = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+  return lastDayInMonthDate;
+}
+
 // An integer number, between 1 and 31
 function getLastDayInMonth(date) {
-  const lastDayInMonth = new Date(date.getFullYear(), date.getMonth() + 1, 0);
-  return lastDayInMonth;
+  const lastDayInMonthDate = getLastDayInMonthDate(date); 
+  return lastDayInMonthDate.getDate();
 }
+
 
 function constructCalendarDays(date) {
   const monthFirstDayIndex = getWeekDayOfFirstDayInMonth(date);
@@ -80,12 +86,68 @@ function renderCalendarTitle(date) {
   calendarTitle.classList.remove("month__title--loading");
 }
 
+function renderCalendarMonth(date) {
+  const calendarDays = constructCalendarDays(date);
+  renderCalendarCells(calendarDays);
+  renderCalendarTitle(date);
+  setCurrentMonthToDOM(date);
+}
+
+function setCurrentMonthToDOM(currentDate) {
+  const monthElement = document.querySelector(".calendar__month");
+  if (!monthElement) {
+    return;
+  }
+
+  monthElement.dataset.currentMonth = currentDate.getTime();
+}
+
+function getCurrentMonthFromDOM() {
+  const monthElement = document.querySelector(".calendar__month");
+  if (!monthElement) {
+    return;
+  }
+
+  const currentDateTimeStamp =  monthElement.dataset.currentMonth;
+  return new Date(+currentDateTimeStamp);
+}
+
+function changeMonthHandler(event) {
+  const currentDate = getCurrentMonthFromDOM();
+  if (!currentDate) {
+    return;
+  }
+
+  const navigationElement = event.currentTarget;
+  const isPreviousMonth = navigationElement.classList.contains("calendar__month-navigation--previous");
+
+  const currentMonthLastDayDate = getLastDayInMonthDate(currentDate);
+  let newMonthDate = new Date(currentDate);
+  if (isPreviousMonth) {
+    newMonthDate.setDate(0);
+  } else {
+    newMonthDate = new Date(
+      currentMonthLastDayDate.getFullYear(),
+      currentMonthLastDayDate.getMonth(),
+      currentMonthLastDayDate.getDate() + 1
+    );
+  }
+
+  renderCalendarMonth(newMonthDate);
+}
+
+function attachMonthChangeHandlers() {
+  const navigationButtons = document.querySelectorAll(".calendar__month-navigation");
+  for (let buttonIndex = 0; buttonIndex < navigationButtons.length; buttonIndex++) {
+    navigationButtons[buttonIndex].addEventListener("click", changeMonthHandler);
+  }
+}
+
 function initializeCalendar() {
   const currentDate = new Date();
 
-  const calendarDays = constructCalendarDays(currentDate);
-  renderCalendarCells(calendarDays);
-  renderCalendarTitle(currentDate);
+  attachMonthChangeHandlers();
+  renderCalendarMonth(currentDate);
 }
 
 initializeCalendar();
